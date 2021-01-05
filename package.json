@@ -1,0 +1,25 @@
+{
+  "name": "whatsbot",
+  "version": "2.0.0",
+  "description": "",
+  "main": "src/whatsbot.js",
+  "scripts": {
+    "start": "node src/whatsbot.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fermino/WhatsBot-2.git"
+  },
+  "author": "Fermín Olaiz, Ana Liz Lubomirsky",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/fermino/WhatsBot-2/issues"
+  },
+  "homepage": "https://github.com/fermino/WhatsBot-2#readme",
+  "dependencies": {
+    "puppeteer": "^5.5.0",
+    "sequelize": "^6.3.5",
+    "sqlite3": "^5.0.0"
+  }
+}
