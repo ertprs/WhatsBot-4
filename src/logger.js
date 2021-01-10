@@ -12,7 +12,6 @@ class Logger
 		}
 
 		if(display) {
-			//if(typeof(l) !== 'object')
 			process.stdout.write(' => ')
 			console.log(l)
 		}
@@ -24,7 +23,7 @@ class Logger
 			global.sessionID = new Date().getTime()
 
 		// Explota todo, vosfi
-		//Log.create({ sessionID: global.sessionID, message: l })
+		await Log.create({ sessionID: global.sessionID, message: l })
 	}
 
 	// Client stuff
@@ -38,7 +37,7 @@ class Logger
 
 		if(created)
 			// TODO: Also log name
-			this.log('New user created: ' + msg.from)
+			await this.log('New user created: ' + msg.from)
 
 		const message = await Message.create({
 			data: JSON.stringify(msg)

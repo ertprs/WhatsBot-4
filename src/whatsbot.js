@@ -12,10 +12,6 @@ const i18n = require('./i18n')
 // Main
 ;(async () => {
 	try {
-		/**
-			Debug and test code!
-		 */
-
 		// Inicializamos el bot, si es posible con los datos de sesión previos
 		let sessionData = fs.existsSync(_path(SESSION_FILE_PATH)) ? require(_path(SESSION_FILE_PATH)) : null
 		const client = new Client({ puppeteer: { headless: false }, session: sessionData })
@@ -44,24 +40,24 @@ const i18n = require('./i18n')
 
 		client.on('message', async (msg) => {
 			try {
-				// Limpiamos el cache de require así podemos recargar el parser cada vez que lo usamos. 
-				Object.keys(require.cache).forEach(function(key) { delete require.cache[key] })
+				// Limpiamos el cache de require así podemos recargar el parser cada vez que lo usamos.
+				//Object.keys(require.cache).forEach(function(key) { delete require.cache[key] })
 				const parser = require('./parser')(client)
 
 				const response = await parser.parseMessage(msg)
 				if(!response.success && typeof(response.message) !== 'undefined' && response.message !== null) {
 					// TODO: Add language support / module
-					rep = i18n(response.message)
+					const rep = i18n(response.message)
 					if(rep !== null)
-						msg.reply(rep)
+						await msg.reply(rep)
 					else {
-						logger.log('Locale string not found')
-						logger.log(response)
+						await logger.log('Locale string not found')
+						await logger.log(response)
 					}
 				}
 			} catch (err) {
-				logger.log('Parser fatal error')
-				logger.log(err)
+				await logger.log('Parser fatal error')
+				await logger.log(err)
 			}
 		})
 
@@ -70,7 +66,7 @@ const i18n = require('./i18n')
 			throw e
 		})
     } catch (e) {
-		logger.log(e)
+		await logger.log(e)
 		// TODO: Cerrar WP!
 	}
 })()

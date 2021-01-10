@@ -40,8 +40,8 @@ module.exports = (client) =>
 			if(PARSER_COMMAND_CHAR === msg.body.charAt(0)) {
 				// TODO: STRTOLOWER
 				const command = msg.body.substring(1, msg.body.indexOf(' '))
-				const response = await this.executer.executeCommandModule(command, msg)
 
+				const response = await this.executer.executeCommandModule(command, msg)
 				if(!response.success)
 					return response
 			}
