@@ -19,7 +19,9 @@
   "homepage": "https://github.com/fermino/WhatsBot-2#readme",
   "dependencies": {
     "puppeteer": "^5.5.0",
+    "qrcode-terminal": "^0.12.0",
     "sequelize": "^6.3.5",
-    "sqlite3": "^5.0.0"
+    "sqlite3": "^5.0.0",
+    "whatsapp-web.js": "^1.12.0"
   }
 }
