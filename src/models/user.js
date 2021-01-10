@@ -1,8 +1,6 @@
 const { Model, DataTypes } = require('sequelize')
 module.exports = (sequelize) =>
 {
-	const logger = require('../logger')
-
 	// Helpers
 	class User extends Model
 	{
@@ -20,7 +18,7 @@ module.exports = (sequelize) =>
 			this.blocked = true
 			// TODO: Add block reason somewhere more locatable in the table?
 			await this.save()
-			logger.log('The user ' + this.username + ' has been blocked (reason: ' + reason + ').')
+			this.logger.log('The user ' + this.username + ' has been blocked (reason: ' + reason + ').')
 		}
 
 		hasClearance = (requiredAccessLevel) =>
@@ -56,6 +54,8 @@ module.exports = (sequelize) =>
 	}, {
 		sequelize
 	})
+
+	User.prototype.logger = require('../logger')
 
 	return User
 }
