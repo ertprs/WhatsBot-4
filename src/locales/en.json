@@ -1,4 +1,9 @@
 {
-  "module_not_found": "Module not found"
-
+  "module_not_found": "Module not found",
+  "blocked_max_messages": "Blocked max messages",
+  "user_disabled_warning_message_limit": "User disabled warning message limit",
+  "attack_attempted_blocked": "Attack attempted blocked",
+  "module_not_found": "Module not found",
+  "module_not_allowed": "Module not allowed",
+  "module_fatal_error": "Module fatal error"
 }
