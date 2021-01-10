@@ -1,4 +1,4 @@
-const { _path } = require('./utils')
+const { _path, _craftResponse } = require('./utils')
 const { User } = require('./db')
 const logger = require('./logger')
 const fs = require('fs')
@@ -31,19 +31,19 @@ module.exports = (client) =>
 			// If we can't find the user, that's really wrong because it should've been added beforehand
 			if(user === null) {
 				logger.log("Can't find user " + msg.from + " in the DB. It should have been added by the logger, ignoring message...")
-				return this.craftResponse(false, null /*'user_not_found'*/)
+				return _craftResponse(false, null /*'user_not_found'*/)
 			}
 
 			if(user.blocked) {
 				logger.log('Message from blocked user ' + msg.from + '. Ignoring...')
-				return this.craftResponse(false)
+				return _craftResponse(false)
 			}
 
 			// If the user is not enabled and has sent more than 3 messages, isEnabled will block the user. 
 			// ONLY if it's a command module. 
 			// TODO: ALL THE MESSAGES SHOULD BE BLOCKED IF ITS A PRIVATE MESSAGE!!!
 			if(!user.isEnabled(type === COMMAND_MODULE)) {
-				return this.craftResponse(false, 'user_disabled_warning_message_limit')
+				return _craftResponse(false, 'user_disabled_warning_message_limit')
 			}
 
 			return await module.exports.executeModule(type, moduleName, msg, user)
@@ -60,12 +60,12 @@ module.exports = (client) =>
 			// If the user is trying to access a file outside the safe path
 			if(!this.isSafePath(path)) {
 				user.block('module_path_attack_attempted')
-				return this.craftResponse(false, 'attack_attempted_blocked')
+				return _craftResponse(false, 'attack_attempted_blocked')
 			}
 
 			// If the module doesn't exist
 			if(!fs.existsSync(path))
-				return this.craftResponse(false, 'module_not_found')
+				return _craftResponse(false, 'module_not_found')
 
 			// Try to load the module and execute it
 			try {
@@ -78,7 +78,7 @@ module.exports = (client) =>
 
 				// TODO: Log the amount of times an user tries and block if exceeds it
 				if(!user.hasClearance(mod.config.requiredAccessLevel))
-					return this.craftResponse(false, 'module_not_allowed')
+					return _craftResponse(false, 'module_not_allowed')
 
 				// Now the module is loaded and the user has clearance
 				// TODO: Unroll the args for the module ?
@@ -92,7 +92,7 @@ module.exports = (client) =>
 				logger.log('Module fatal error')
 				logger.log(err)
 
-				return this.craftResponse(false, 'module_fatal_error')
+				return _craftResponse(false, 'module_fatal_error')
 			}
 		}
 
@@ -101,15 +101,6 @@ module.exports = (client) =>
 		{
 			// TODO
 			return true;
-		}
-		// TODO: Move to utils? Or to logger?
-		craftResponse = (success, message = null) =>
-		{
-			// TODO: Log responses ?
-			return {
-				success: success,
-				message: message,
-			}
 		}
 	}
 

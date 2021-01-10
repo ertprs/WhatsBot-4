@@ -5,10 +5,9 @@
 
 const { _path } = require('./utils')
 const logger = require('./logger')
-const p = require('./parser')
-const e = require('./executer')
 const { Client } = require('whatsapp-web.js')
 const fs = require('fs')
+const i18n = require('./i18n')
 
 // Main
 ;(async () => {
@@ -47,11 +46,13 @@ const fs = require('fs')
 			try {
 				// Limpiamos el cache de require así podemos recargar el parser cada vez que lo usamos. 
 				Object.keys(require.cache).forEach(function(key) { delete require.cache[key] })
-				const parser = require('./parser')
-				await parser.setClient(client)
-				await parser.parseMessage(msg)
+				const parser = require('./parser')(client)
 
-				// TODO: Handle response!!
+				const response = await parser.parseMessage(msg)
+				if(!response.success && typeof(response.message) !== 'undefined' && response.message !== null) {
+					// TODO: Add language support / module
+					msg.reply(i18n(response.message))
+				}
 			} catch (err) {
 				logger.log('Parser fatal error')
 				logger.log(err)

@@ -6,6 +6,7 @@ const PARSER_COMMAND_CHAR = '.'
 
 const logger = require('./logger')
 const executer = require('./executer')
+const { _craftResponse } = require('./utils')
 
 // TODO: Use utils - craftResponse - maybe create an object? ORM???
 module.exports = (client) =>
@@ -26,6 +27,10 @@ module.exports = (client) =>
 			let response = await this.parseForCommand(msg)
 			if(!response.success)
 				return response
+
+			// TODO: Parse for other modules
+
+			return _craftResponse(true)
 		}
 		async parseForCommand(msg)
 		{
@@ -40,7 +45,7 @@ module.exports = (client) =>
 					return response
 			}
 
-			return { success: true, message: null }
+			return _craftResponse(true)
 		}
 	}
 
