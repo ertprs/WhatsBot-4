@@ -23,7 +23,8 @@ class Logger
 		if(!global.sessionID)
 			global.sessionID = new Date().getTime()
 
-		Log.create({ sessionID: global.sessionID, message: l })
+		// Explota todo, vosfi
+		//Log.create({ sessionID: global.sessionID, message: l })
 	}
 
 	// Client stuff

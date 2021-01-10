@@ -56,6 +56,7 @@ class Executer
 
 		// If the user is trying to access a file outside the safe path
 		if(!this.isSafePath(path)) {
+			logger.log('Module path attack attempted. Blocking user...')
 			user.block('module_path_attack_attempted')
 			return _craftResponse(false, 'attack_attempted_blocked')
 		}

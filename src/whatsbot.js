@@ -54,8 +54,10 @@ const i18n = require('./i18n')
 					rep = i18n(response.message)
 					if(rep !== null)
 						msg.reply(rep)
-					else
-						logger.log("REVENTO TODO TODOS A LOS BOTES")
+					else {
+						logger.log('Locale string not found')
+						logger.log(response)
+					}
 				}
 			} catch (err) {
 				logger.log('Parser fatal error')
