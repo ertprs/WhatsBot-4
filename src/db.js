@@ -13,8 +13,6 @@ const _db_template_id = {
 	primaryKey: true
 }
 
-//module.exports
-
 /**
  * Definiciones
  */
@@ -25,7 +23,7 @@ sequelize.define('Log', {
 	message: DataTypes.TEXT,
 })
 
-sequelize.define('User', {
+/*sequelize.define('User', {
 	id: _db_template_id,
 	username: {
 		type: DataTypes.STRING,
@@ -44,7 +42,7 @@ sequelize.define('User', {
 		type: DataTypes.BOOLEAN,
 		defaultValue: false,
 	},
-})
+})*/
 
 sequelize.define('Message', {
 	id: _db_template_id,
@@ -58,22 +56,7 @@ sequelize.define('Message', {
 	},
 	data: DataTypes.TEXT,
 })
-sequelize.models.Message.belongsTo(sequelize.models.User)
-sequelize.models.User.hasMany(sequelize.models.Message)
-sequelize.models.User.prototype.hasClearance = (user, requiredClearance) =>
-{
 
-    User.prototype.isValidPassword = async (user, userInputtedPassword) => {
-        try {
-            return await bcrypt.compare(userInputtedPassword, user.password);
-        } catch (error) {
-            throw new Error(error);
-        }
-    };
-
-    return User;
-	return 
-}
 
 /**
  * Exports
@@ -81,9 +64,13 @@ sequelize.models.User.prototype.hasClearance = (user, requiredClearance) =>
 module.exports = {
 	// _sequelize: sequelize,
 	Log: 		sequelize.models.Log,
-	User:		sequelize.models.User,
+	User:		require('./models/user')(sequelize),
 	Message:	sequelize.models.Message
 }
+
+// Relations between models
+sequelize.models.Message.belongsTo(sequelize.models.User)
+sequelize.models.User.hasMany(sequelize.models.Message)
 
 /*
 class Error extends Model {}
