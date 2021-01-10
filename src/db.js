@@ -46,14 +46,14 @@ sequelize.define('Log', {
 
 sequelize.define('Message', {
 	id: _db_template_id,
-	userId: {
+	/*userId: {
 		type: _db_template_id.type,
 		// Es necesario??
-		references: {
+		/*references: {
 			model: sequelize.models.User,
 			key: 'id',
-		}
-	},
+		}*
+	},*/
 	data: DataTypes.TEXT,
 })
 
@@ -85,4 +85,4 @@ Error.init({
 })*/
 
 // Sincronizamos la DB, por ahora solo porque estamos en testing. 
-//sequelize.sync({ alter: true })
+sequelize.sync({ alter: true })
