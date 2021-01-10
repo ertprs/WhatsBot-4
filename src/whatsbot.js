@@ -3,6 +3,18 @@
  */
 	const SESSION_FILE_PATH = 'data/session.json'
 
+	const CLEAN_REQUIRE_CACHE = [
+		'src/db',
+		'src/executer',
+		'src/i18n',
+		'src/logger',
+		'src/parser',
+		'src/utils',
+		'src/models/',
+		'src/modules/',
+		'src/locales',
+	];
+
 const { _path } = require('./utils')
 const logger = require('./logger')
 const { Client } = require('whatsapp-web.js')
@@ -40,8 +52,15 @@ const i18n = require('./i18n')
 
 		client.on('message', async (msg) => {
 			try {
-				// Limpiamos el cache de require así podemos recargar el parser cada vez que lo usamos.
-				//Object.keys(require.cache).forEach(function(key) { delete require.cache[key] })
+				// Limpiamos el cache de require así podemos hacer deploys continuos
+				Object.keys(require.cache).forEach(function(key) {
+					CLEAN_REQUIRE_CACHE.forEach((string) => {
+						if(key.indexOf(string) !== -1) {
+							delete require.cache[key]
+						}
+					})
+				})
+
 				const parser = require('./parser')(client)
 
 				const response = await parser.parseMessage(msg)

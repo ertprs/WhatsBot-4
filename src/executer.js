@@ -69,7 +69,7 @@ class Executer
 		// TODO: Check types ?
 		// TODO: Check the module path to prevent attacks
 
-		const path = _path('src/modules/' + type + '_' + moduleName)
+		const path = _path('src/modules/' + type + '_' + moduleName + '.js')
 
 		// If the user is trying to access a file outside the safe path
 		if(!this.isSafePath(path)) {
@@ -99,11 +99,13 @@ class Executer
 
 			// Now the module is loaded and the user has clearance
 			// TODO: Unroll the args for the module ?
-			const response = await mod[moduleName](this.client, data)
+			const response = await mod[moduleName](data, this.client)
 
 			// TODO: Check if it would not be undefined if there's no return
-			if(response !== null && response.success === false)
+			if(typeof(response) !== 'undefined' && response !== null && typeof(response.success) !== 'undefined' && response.success === false) {
+				console.log(response)
 				return response
+			}
 
 		} catch(err) {
 			await logger.log('Module fatal error')
