@@ -102,11 +102,10 @@ class Executer
 			const response = await mod[moduleName](data, this.client)
 
 			// TODO: Check if it would not be undefined if there's no return
-			if(typeof(response) !== 'undefined' && response !== null && typeof(response.success) !== 'undefined' && response.success === false) {
-				console.log(response)
+			if(typeof(response) !== 'undefined' && response !== null && typeof(response.success) !== 'undefined' && response.success === false)
 				return response
-			}
 
+			return _craftResponse(true)
 		} catch(err) {
 			await logger.log('Module fatal error')
 			await logger.log(err)
