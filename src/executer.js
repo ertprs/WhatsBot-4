@@ -1,84 +1,117 @@
-const { _path, _log } = require('./utils.js')
-const { User } = require('./db.js')
+const { _path } = require('./utils')
+const { User } = require('./db')
+const logger = require('./logger')
 const fs = require('fs')
 
 const COMMAND_MODULE = 'command'
 
-module.exports = {
-
-
-	// async executeModule generico que haga todo el chiste de permisos y etc.
-	// msg se convierte en data y se pasa como arg a todos los modulos!
-	async executeCommandModule(command, msg)
+// TODO: instead of receiving the msg itself, it should receive an user object from the web-whatsapp api
+module.exports = (client) => 
+{
+	class Executer
 	{
-		return await module.exports.executeMessageModule('command', command, msg)
-	},
-	async executeMessageModule(type, moduleName, msg)
-	{
-		// TODO: Move to User class
-		const user = await User.findOne({ where: { username: msg.from }})
-		if(! await module.exports.isEnabled(user /* TODO: BLOCK SOLO SI != GRUPO */)) {
-			_log("El usuario " + msg.from + " está deshabilitado o bloqueado. Ignorando mensaje...")
-			return
+		constructor(client)
+		{
+			this.client = client
 		}
 
-		// TODO: If has clearance
+		// Alias
+		async executeCommandModule(command, msg)
+		{
+			return await module.exports.executeMessageModule('command', command, msg)
+		}
 
-		return await module.exports.executeModule(type, moduleName, msg)
-	},
-	async executeModule(type, moduleName, data)
-	{
-		// TODO: Check types ?
-		// TODO: Check the module path to prevent attacks
-		let commandPath = _path('src/modules/' + type + '_' + moduleName + '.js')
+		// The actual stuff
+		async executeMessageModule(type, moduleName, msg)
+		{
+			const user = await User.findOne({
+				where: { username: msg.from}
+			})
 
-		if(fs.existsSync(commandPath)) {
+			// If we can't find the user, that's really wrong because it should've been added beforehand
+			if(user === null) {
+				logger.log("Can't find user " + msg.from + " in the DB. It should have been added by the logger, ignoring message...")
+				return this.craftResponse(false, null /*'user_not_found'*/)
+			}
+
+			if(user.blocked) {
+				logger.log('Message from blocked user ' + msg.from + '. Ignoring...')
+				return this.craftResponse(false)
+			}
+
+			// If the user is not enabled and has sent more than 3 messages, isEnabled will block the user. 
+			// ONLY if it's a command module. 
+			// TODO: ALL THE MESSAGES SHOULD BE BLOCKED IF ITS A PRIVATE MESSAGE!!!
+			if(!user.isEnabled(type === COMMAND_MODULE)) {
+				return this.craftResponse(false, 'user_disabled_warning_message_limit')
+			}
+
+			return await module.exports.executeModule(type, moduleName, msg, user)
+		}
+
+		// Main module, the core logic happens here
+		async executeModule(type, moduleName, data, user)
+		{
+			// TODO: Check types ?
+			// TODO: Check the module path to prevent attacks
+
+			const path = _path('src/modules/' + type + '_' + moduleName)
+
+			// If the user is trying to access a file outside the safe path
+			if(!this.isSafePath(path)) {
+				user.block('module_path_attack_attempted')
+				return this.craftResponse(false, 'attack_attempted_blocked')
+			}
+
+			// If the module doesn't exist
+			if(!fs.existsSync(path))
+				return this.craftResponse(false, 'module_not_found')
+
+			// Try to load the module and execute it
 			try {
-				const mod = require(commandPath)
+				const mod = require(path)
 
+				// Check the access level, if not set, set to maximum
 				if(typeof mod.config.requiredAccessLevel === 'undefined')
+					// TODO: Avoid hardcoding the numbers this way, use enum type maybe?
 					mod.config.requiredAccessLevel = 1
 
-				console.log(typeof(mod[moduleName]))
-			} catch (err) {
-				_log(err)
-				msg.reply('Ocurrió un error al ejecutar el módulo')
+				// TODO: Log the amount of times an user tries and block if exceeds it
+				if(!user.hasClearance(mod.config.requiredAccessLevel))
+					return this.craftResponse(false, 'module_not_allowed')
+
+				// Now the module is loaded and the user has clearance
+				// TODO: Unroll the args for the module ?
+				const response = await mod[moduleName](client, data)
+
+				// TODO: Check if it would not be undefined if there's no return
+				if(response !== null && response.success === false)
+					return response
+
+			} catch(err) {
+				logger.log('Module fatal error')
+				logger.log(err)
+
+				return this.craftResponse(false, 'module_fatal_error')
 			}
-		} else {
-			msg.reply('El módulo no existe')
-		}
-	},
-	/**
-	 * TODO: Move to User class
-	 */
-	async isEnabled(user, block = true)
-	{
-		if(user === null || user.blocked)
-			return false
-
-		if(!user.enabled && (await user.countMessages()) > 10 && block) {
-			_log("El usuario " + user.username + " ha superado los 10 mensajes sin estar habilitado, bloqueando...")
-			user.blocked = true
-			user.save()
-
-			return false
 		}
 
-		return true
-	},
-	async hasClearance(user, command)
-	{
+		// Helpers
+		isSafePath = (path) =>
+		{
+			// TODO
+			return true;
+		}
+		// TODO: Move to utils? Or to logger?
+		craftResponse = (success, message = null) =>
+		{
+			// TODO: Log responses ?
+			return {
+				success: success,
+				message: message,
+			}
+		}
+	}
 
-		
-
-		// TODO: Check module configs!
-
-		return true;
-	},
-	async isSafePath(path)
-	{
-		// TODO
-		// If not, block ;)
-		return true;
-	},
+	return Executer
 }

@@ -4,6 +4,6 @@ module.exports = {
 		msg.reply(msg.body.substring(6))
 	},
 	config: {
-		// requiredClearance: 1,
+		requiredAccessLevel: 9,
 	},
 }

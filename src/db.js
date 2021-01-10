@@ -85,4 +85,4 @@ Error.init({
 })*/
 
 // Sincronizamos la DB, por ahora solo porque estamos en testing. 
-sequelize.sync({ alter: true })
+//sequelize.sync({ alter: true })
