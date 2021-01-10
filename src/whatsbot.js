@@ -51,7 +51,11 @@ const i18n = require('./i18n')
 				const response = await parser.parseMessage(msg)
 				if(!response.success && typeof(response.message) !== 'undefined' && response.message !== null) {
 					// TODO: Add language support / module
-					msg.reply(i18n(response.message))
+					rep = i18n(response.message)
+					if(rep !== null)
+						msg.reply(rep)
+					else
+						logger.log("REVENTO TODO TODOS A LOS BOTES")
 				}
 			} catch (err) {
 				logger.log('Parser fatal error')

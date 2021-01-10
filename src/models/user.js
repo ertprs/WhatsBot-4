@@ -1,6 +1,8 @@
 const { Model, DataTypes } = require('sequelize')
 module.exports = (sequelize) =>
 {
+	const logger = require('../logger')
+
 	// Helpers
 	class User extends Model
 	{

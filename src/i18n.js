@@ -1,5 +1,6 @@
 const { _path } = require('./utils')
 const fs = require('fs')
+const logger = require('./logger')
 
 function getString(key, language = 'en', module = null)
 {
