@@ -3,7 +3,7 @@ const { Log, User, Message } = require('./db')
 class Logger
 {
 	// Internal stuff
-	async log(l = null, display = true)
+	static async log(l = null, display = true)
 	{
 		// TODO: Notify via email if it's an exception or an error and we're in production
 		if(l === null) {
@@ -27,7 +27,7 @@ class Logger
 	}
 
 	// Client stuff
-	async logMessage(msg)
+	static async logMessage(msg)
 	{
 		// Dejamos los datos del usuario como están, eso nos va a permitir tener granularidad con los permisos (grupos, etc)
 		// TODO: Agregar datos de la persona si es nueva!
